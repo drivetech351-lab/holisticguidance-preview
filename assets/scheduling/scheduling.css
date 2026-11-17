@@ -1,0 +1,158 @@
+/* Booking button + agreement step — uses the site palette from assets/site.css */
+/* Book a Session section — centered, matches the site's card + type system */
+#book .booking-stage {
+  max-width: 880px;
+  align-items: center;
+  text-align: center;
+}
+#book .booking-stage > .flourish { margin: 0 auto 26px; }
+#book .booking-stage > h2 { margin-bottom: 36px; }
+.booking-cta {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 0 0 56px;
+}
+.btn.btn-book {
+  margin-top: 0;
+  min-width: min(300px, 100%);
+  padding: 18px 44px;
+  font-size: 1rem;
+  letter-spacing: .18em;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(3, 73, 47, .16);
+}
+#book .booking-block {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  background: var(--warm-white, #fbfaf8);
+  border: 1px solid var(--line, rgba(3, 73, 47, .14));
+  border-radius: 6px;
+  padding: clamp(32px, 5vw, 56px) clamp(22px, 6vw, 72px);
+  box-shadow: 0 18px 44px rgba(3, 73, 47, .06);
+}
+#book .booking-block h3 {
+  margin: 0 0 20px;
+  font-size: clamp(1.5rem, 4.6vw, 2rem);
+}
+#book .booking-block h3::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 1px;
+  margin: 18px auto 0;
+  background: var(--gold, #c2a15b);
+}
+#book .booking-block p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--muted, #5d665e);
+  line-height: 1.85;
+}
+#book .disclaimer { margin-top: 32px; }
+@media (min-width: 1024px) {
+  .booking-cta { margin-bottom: 64px; }
+  #book .booking-block p { font-size: 1.05rem; }
+}
+.btn.btn-book:focus-visible,
+.booking-continue:focus-visible,
+.booking-modal-close:focus-visible,
+.booking-agree input:focus-visible {
+  outline: 2px solid var(--gold, #c2a15b);
+  outline-offset: 3px;
+}
+
+html.booking-modal-open, html.booking-modal-open body { overflow: hidden; }
+.booking-modal[hidden] { display: none; }
+.booking-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+  background: rgba(3, 40, 26, .55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.booking-modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  max-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--warm-white, #fbfaf8);
+  border: 1px solid var(--line, rgba(3, 73, 47, .14));
+  border-radius: 6px;
+  padding: clamp(28px, 5vw, 44px) clamp(20px, 5vw, 40px);
+  box-shadow: 0 24px 60px rgba(3, 73, 47, .25);
+  text-align: center;
+  color: var(--ink, #2f3a32);
+}
+.booking-modal-dialog::before {
+  content: '';
+  display: block;
+  width: min(150px, 60%);
+  height: 18px;
+  margin: 0 auto 18px;
+  background: url(../gold-flourish.svg) center/contain no-repeat;
+}
+.booking-modal-dialog:focus { outline: none; }
+.booking-modal-dialog h3 { margin: 0 0 18px; font-size: clamp(1.6rem, 5vw, 2.1rem); }
+.booking-modal-policy { margin: 0 0 26px; color: var(--muted, #5d665e); line-height: 1.8; }
+.booking-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--forest, #03492f);
+  font: 300 2rem/1 var(--serif, Georgia, serif);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background .3s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .booking-modal-close:hover { background: var(--mist, #eff4f0); }
+}
+.booking-agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+  padding: 16px 18px;
+  background: var(--mist, #eff4f0);
+  border: 1px solid var(--line, rgba(3, 73, 47, .14));
+  border-radius: 4px;
+  font: 400 1rem/1.45 var(--sans, 'Pontano Sans', Arial, sans-serif);
+  color: var(--ink, #2f3a32);
+  cursor: pointer;
+}
+.booking-agree input {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  accent-color: var(--forest, #03492f);
+  cursor: pointer;
+}
+.booking-modal-actions { margin-top: 22px; display: flex; justify-content: center; }
+.booking-modal-actions .btn { margin-top: 0; width: 100%; }
+.booking-continue[aria-disabled="true"] {
+  opacity: .4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}

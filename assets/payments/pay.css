@@ -1,0 +1,199 @@
+/* Complete your payment — /pay/ — phone-first, scoped to this page */
+body {
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1 0 auto;
+}
+.pay-section {
+  padding: 28px var(--safe-right) 48px var(--safe-left);
+}
+.pay-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+}
+.pay-steps {
+  margin: 0 0 20px;
+  text-align: left;
+  font: 400 .95rem/1.55 var(--sans);
+  color: var(--muted);
+}
+.pay-steps ol {
+  margin: 0;
+  padding: 0 0 0 1.15em;
+}
+.pay-steps li {
+  margin: 0 0 .2em;
+}
+.pay-heading {
+  margin: 0 0 12px;
+  font: 400 .76rem/1.4 var(--sans);
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.pay-wrap[data-pay-mode="thanks"] .pay-heading,
+.pay-wrap[data-pay-mode="post"] .pay-heading {
+  font: 400 clamp(1.6rem, 6vw, 2.2rem)/1.2 var(--serif);
+  letter-spacing: .04em;
+  text-transform: none;
+  color: var(--forest);
+}
+.pay-amount {
+  margin: 0 0 6px;
+  font: 300 clamp(3.25rem, 16vw, 5rem)/1 var(--serif);
+  letter-spacing: .02em;
+  color: var(--forest);
+}
+.pay-note {
+  margin: 0 0 6px;
+  font: 400 clamp(1.25rem, 4.2vw, 1.55rem)/1.4 var(--serif);
+  color: var(--ink);
+}
+.pay-when {
+  margin: 0;
+  font: 500 1rem/1.45 var(--sans);
+  color: var(--ink);
+}
+.pay-for {
+  margin: 2px 0 0;
+  font: 400 .9rem/1.4 var(--sans);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.pay-fields {
+  margin: 22px 0 0;
+  text-align: left;
+}
+.pay-field {
+  display: block;
+  margin: 0 0 14px;
+}
+.pay-field span {
+  display: block;
+  margin: 0 0 6px;
+  font: 500 .82rem/1.4 var(--sans);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+.pay-field input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--warm-white);
+  color: var(--ink);
+  font: 400 1rem/1.4 var(--sans);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.pay-field input:focus {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+.pay-venmo-btn {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 60px;
+  padding: 18px 24px;
+  box-sizing: border-box;
+  background: #008CFF;
+  color: #fff;
+  text-decoration: none;
+  font: 500 1.15rem/1.2 var(--sans);
+  letter-spacing: .02em;
+  border: 0;
+  border-radius: 8px;
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: rgba(0, 140, 255, .25);
+}
+.pay-venmo-btn:active {
+  background: #0074d4;
+}
+.pay-venmo-btn[aria-disabled="true"] {
+  background: #8fb8d9;
+  color: #f4f8fb;
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .7;
+}
+.pay-confirm {
+  margin: 20px 0 0;
+  font: 400 .95rem/1.5 var(--sans);
+  color: var(--muted);
+}
+.pay-step3 {
+  margin: 22px 0 0;
+}
+.pay-calendly-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: .02em;
+  font-weight: 500;
+}
+.pay-calendly-btn[aria-disabled="true"] {
+  opacity: .4;
+  pointer-events: none;
+}
+.pay-qr,
+.pay-qr[hidden] {
+  display: none;
+  margin: 40px auto 0;
+  max-width: 260px;
+}
+.pay-qr img {
+  display: block;
+  width: 160px;
+  height: auto;
+  image-rendering: pixelated;
+  margin: 0 auto;
+  background: #fff;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.pay-qr figcaption {
+  margin-top: 10px;
+  font: 400 .82rem/1.4 var(--sans);
+  color: var(--muted);
+}
+
+@media (min-width: 768px) {
+  .pay-section {
+    padding: 56px var(--safe-right) 80px var(--safe-left);
+  }
+  .pay-qr:not([hidden]) {
+    display: block;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pay-venmo-btn:hover {
+    background: #0074d4;
+  }
+  .pay-venmo-btn[aria-disabled="true"]:hover {
+    background: #8fb8d9;
+  }
+}

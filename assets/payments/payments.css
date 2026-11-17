@@ -1,0 +1,89 @@
+/* Modular payments section — uses the site palette from assets/site.css */
+.payments-section {
+  background: var(--cream-deep, #ede5d6);
+  text-align: center;
+  padding: 84px env(safe-area-inset-right, 0px) 84px env(safe-area-inset-left, 0px);
+}
+.payments-section .wrap.narrow {
+  margin: 0 auto;
+}
+.book-modules {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(20px, 3vw, 32px);
+  align-items: stretch;
+}
+.book-modules .payments-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(36px, 5vw, 64px) clamp(22px, 4vw, 48px);
+}
+.payments-panel {
+  position: relative;
+  background: var(--warm-white, #fbfaf8);
+  border: 1px solid var(--line, rgba(3, 73, 47, .14));
+  border-radius: 6px;
+  padding: clamp(44px, 7vw, 80px) clamp(28px, 6vw, 84px);
+  box-shadow: 0 18px 44px rgba(3, 73, 47, .06);
+}
+.payments-panel .flourish {
+  margin-left: auto;
+  margin-right: auto;
+}
+.payments-panel .label {
+  color: var(--gold-deep, #9c7d3c);
+}
+.payments-panel h2 {
+  margin: 0 0 8px;
+}
+.payments-panel .squiggle {
+  width: min(280px, 70%);
+  height: 28px;
+  margin: 18px auto 22px;
+  background: url(../gold-squiggle.svg) center/100% 100% no-repeat;
+}
+.payments-panel .payments-note {
+  margin: 0 auto 8px;
+  max-width: 420px;
+  font: 400 clamp(1.2rem, 2.2vw, 1.5rem)/1.5 var(--serif, 'Cormorant Garamond', Georgia, serif);
+  color: var(--ink, #2f3a32);
+}
+.payments-actions {
+  margin-top: 28px;
+}
+.payments-actions .btn,
+.payments-actions .btn-payments {
+  margin-top: 0;
+}
+.btn-payments[disabled],
+.btn-payments[aria-disabled="true"] {
+  background: var(--forest, #03492f);
+  color: var(--warm-white, #fbfaf8);
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+.btn-payments[disabled]:hover,
+.btn-payments[aria-disabled="true"]:hover {
+  background: var(--forest, #03492f);
+  transform: none;
+}
+.payments-status {
+  display: block;
+  margin-top: 16px;
+  font: 400 .76rem/1.4 var(--sans, 'Pontano Sans', Arial, sans-serif);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold-deep, #9c7d3c);
+}
+@media (min-width: 768px) {
+  .payments-section { padding: 120px env(safe-area-inset-right, 0px) 120px env(safe-area-inset-left, 0px); }
+  .book-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .payments-section { padding: 120px env(safe-area-inset-right, 0px) 120px env(safe-area-inset-left, 0px); }
+}

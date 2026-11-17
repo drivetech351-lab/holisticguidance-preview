@@ -1,0 +1,126 @@
+/* One-screen, 3-step booking flow for #book — uses the site palette */
+.booking-flow {
+  /* keep the existing payments-section cream band */
+}
+.booking-stage {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.booking-indicator {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  width: 100%;
+}
+.booking-indicator li {
+  font: 400 .76rem/1.4 var(--sans, 'Pontano Sans', Arial, sans-serif);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted, #5d665e);
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+}
+.booking-indicator li.is-done {
+  color: var(--sage-deep, #5f7a5f);
+}
+.booking-indicator li[aria-current="step"] {
+  color: var(--forest, #03492f);
+  border-bottom-color: var(--gold, #c2a15b);
+}
+.booking-step {
+  width: 100%;
+  text-align: center;
+}
+.booking-step[hidden] {
+  display: none !important;
+}
+.booking-step > h2 {
+  margin: 0 0 22px;
+}
+.booking-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 0 12px;
+}
+.booking-start .flourish {
+  margin-left: auto;
+  margin-right: auto;
+}
+.booking-start .btn {
+  margin-top: 8px;
+}
+.booking-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 10px 12px;
+  min-height: 44px;
+  min-width: 44px;
+  border: 0;
+  background: none;
+  color: var(--muted, #5d665e);
+  font: 400 1rem/1.4 var(--sans, 'Pontano Sans', Arial, sans-serif);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.booking-back:focus { color: var(--forest, #03492f); outline: none; }
+.booking-back:focus-visible {
+  border-bottom: 1px solid var(--gold, #c2a15b);
+}
+.booking-step .payments-panel,
+.booking-step .scheduling-panel {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.scheduling-placeholder-note {
+  display: block;
+  margin-top: 8px;
+  font: 400 .76rem/1.4 var(--sans, 'Pontano Sans', Arial, sans-serif);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold-deep, #9c7d3c);
+}
+.scheduling-actions .btn + .btn,
+.scheduling-actions .btn + .btn-scheduling,
+.scheduling-actions a.btn + button {
+  margin-top: 14px;
+  margin-left: 0;
+}
+.scheduling-confirm {
+  /* secondary confirm under the Calendly link */
+  background: transparent;
+  color: var(--forest, #03492f);
+  border: 1px solid var(--forest, #03492f);
+}
+.calendly-embed-ready {
+  display: none;
+}
+@media (min-width: 768px) {
+  .booking-stage { min-height: 420px; }
+  .booking-indicator { gap: 8px 28px; margin-bottom: 36px; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .booking-back:hover { color: var(--forest, #03492f); }
+  .scheduling-confirm:hover {
+    background: var(--mist, #eff4f0);
+    transform: translateY(-1px);
+  }
+}
+
+/* v3.2 cancellation policy */
+.booking-block { margin: 28px 0; text-align: left; }
+.booking-block h3 { margin-bottom: 10px; }
