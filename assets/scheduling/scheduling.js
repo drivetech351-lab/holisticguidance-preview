@@ -18,7 +18,7 @@
 
   var COPY = {
     button: 'Book a Session',
-    title: 'Cancellation Policy',
+    title: 'Terms and Conditions',
     agree: 'I have read and agree to the cancellation policy.',
     cont: 'Continue to payment',
     close: 'Close'
