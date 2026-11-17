@@ -123,4 +123,5 @@
 
 /* v3.2 cancellation policy */
 .booking-block { margin: 28px 0; text-align: left; }
+.booking-block h2,
 .booking-block h3 { margin-bottom: 10px; }

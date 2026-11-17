@@ -6,6 +6,7 @@
   text-align: center;
 }
 #book .booking-stage > .flourish { margin: 0 auto 26px; }
+#book .booking-stage > h1,
 #book .booking-stage > h2 { margin-bottom: 36px; }
 .booking-cta {
   width: 100%;
@@ -32,10 +33,12 @@
   padding: clamp(32px, 5vw, 56px) clamp(22px, 6vw, 72px);
   box-shadow: 0 18px 44px rgba(3, 73, 47, .06);
 }
+#book .booking-block h2,
 #book .booking-block h3 {
   margin: 0 0 20px;
   font-size: clamp(1.5rem, 4.6vw, 2rem);
 }
+#book .booking-block h2::after,
 #book .booking-block h3::after {
   content: '';
   display: block;
