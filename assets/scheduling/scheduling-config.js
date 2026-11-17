@@ -27,6 +27,6 @@ window.HOLISTIC_SCHEDULING = {
   enabled: true,
   calendlyUrl: 'https://calendly.com/julia-holisticguidance',
   bookingUrl: 'https://calendly.com/julia-holisticguidance/30min?hide_gdpr_banner=1',
-  policyVersion: 'cp-v3.5.1',
-  cancellationPolicy: "Your session is time reserved for you alone, and I ask that it be honored. Rescheduling and cancellation up to 7 days of the appointment will be allowed. Administration fee of 100 dollars will be deducted along with transaction fees. No refund or rescheduling within 48 HOURS of the appointment."
+  policyVersion: 'cp-v3.5.2',
+  cancellationPolicy: "Your session is time reserved for you alone, and I ask that it be honored. Rescheduling and cancellation up to 7 days of the appointment will be allowed. Each booking may be rescheduled once. Administration fee of 100 dollars will be deducted along with transaction fees. No refund or rescheduling within 48 HOURS of the appointment."
 };
