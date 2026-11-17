@@ -7,7 +7,7 @@
   <link rel="icon" href="/holisticguidance-preview/assets/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/holisticguidance-preview/assets/favicon.svg">
   <link rel="apple-touch-icon" href="/holisticguidance-preview/assets/apple-touch-icon.png">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://calendly.com https://www.calendly.com https://buy.stripe.com https://checkout.stripe.com https://square.link https://checkout.square.site; form-action 'self' https://calendly.com https://www.calendly.com https://buy.stripe.com https://checkout.stripe.com https://square.link https://checkout.square.site; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
   <title>Complete your payment · holisticguidance.life</title>
   <meta name="description" content="Complete your $500 payment for a one-hour session.">
   <meta name="robots" content="noindex,nofollow">
@@ -55,9 +55,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Pontano+Sans:wght@400;500&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Pontano+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <script defer src="/holisticguidance-preview/assets/analytics.js?v=3.3.3"></script>
-  <link rel="stylesheet" href="/holisticguidance-preview/assets/site.css?v=3.3.3">
-  <link rel="stylesheet" href="/holisticguidance-preview/assets/payments/pay.css?v=3.3.3">
+  <script defer src="/holisticguidance-preview/assets/analytics.js?v=3.3.4"></script>
+  <link rel="stylesheet" href="/holisticguidance-preview/assets/site.css?v=3.3.4">
+  <link rel="stylesheet" href="/holisticguidance-preview/assets/payments/pay.css?v=3.3.4">
 </head>
 <body>
   <header class="nav">
@@ -99,7 +99,11 @@
             <input type="date" id="pay-date" name="date" data-pay-date autocomplete="off" required>
           </label>
         </div>
-        <a class="pay-venmo-btn" data-venmo-pay aria-disabled="true" tabindex="-1">Pay $500 with Venmo</a>
+        <div class="pay-methods">
+          <p class="pay-venmo-pending" data-venmo-pending hidden>Venmo payment details will be shared with you directly</p>
+          <a class="pay-venmo-btn" data-venmo-pay aria-disabled="true" tabindex="-1">Pay $500 with Venmo</a>
+          <div class="pay-card-slot" data-payments-root hidden></div>
+        </div>
         <p class="pay-confirm" data-pay-confirm>Your session is confirmed once payment is received.</p>
         <div class="pay-step3" data-pay-step3 hidden>
           <a class="btn pay-calendly-btn" data-pay-calendly>I've sent payment — choose my time</a>
@@ -114,11 +118,13 @@
 
   <footer>holisticguidance.life</footer>
 
-  <script defer src="/holisticguidance-preview/assets/vendor/qrcode-generator/qrcode.js?v=3.3.3"></script>
-  <script defer src="/holisticguidance-preview/assets/allowed-urls.js?v=3.3.3"></script>
-  <script defer src="/holisticguidance-preview/assets/scheduling/scheduling-config.js?v=3.3.3"></script>
-  <script defer src="/holisticguidance-preview/assets/payments/pay-config.js?v=3.3.3"></script>
-  <script defer src="/holisticguidance-preview/assets/payments/pay.js?v=3.3.3"></script>
-  <script defer src="/holisticguidance-preview/assets/site.js?v=3.3.3"></script>
+  <script defer src="/holisticguidance-preview/assets/vendor/qrcode-generator/qrcode.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/allowed-urls.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/scheduling/scheduling-config.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/payments/pay-config.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/payments/payments-config.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/payments/payments.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/payments/pay.js?v=3.3.4"></script>
+  <script defer src="/holisticguidance-preview/assets/site.js?v=3.3.4"></script>
 </body>
 </html>

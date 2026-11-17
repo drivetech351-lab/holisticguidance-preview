@@ -2,19 +2,19 @@
  * Modular payments mount for holisticguidance.life.
  *
  * Reads window.HOLISTIC_PAYMENTS and renders into [data-payments-root].
- * Provider adapters are stubs: no network calls, no Stripe or Square
- * SDK scripts, and no secret keys. Swapping providers is a config change.
+ * Provider adapters never load a Stripe or Square SDK, never call a
+ * payment API, and never collect card data on this site. The only
+ * integration is a link to a hosted Payment Link or checkout URL that
+ * has passed HolisticAllowedUrl. Swapping providers is a config change.
+ *
+ * On /pay/: when enabled is true and paymentLinkUrl (or Square's
+ * checkoutUrl) is an allowed https URL, the slot shows a
+ * "Pay $500 by card" link. When enabled is false, or the URL is
+ * missing or rejected, the slot stays empty and hidden — nothing
+ * Stripe- or Square-related is rendered.
  */
 (function (global) {
   'use strict';
-
-  var COPY = {
-    heading: 'Book a Session',
-    pendingLabel: 'Payment integration pending',
-    note: '',
-    button: 'Book a Session',
-    comingSoon: ''
-  };
 
   function el(tag, attrs, children) {
     var node = document.createElement(tag);
@@ -24,7 +24,6 @@
         if (value == null || value === false) return;
         if (key === 'className') node.className = value;
         else if (key === 'text') node.textContent = value;
-        else if (key === 'html') node.innerHTML = value;
         else node.setAttribute(key, value === true ? '' : String(value));
       });
     }
@@ -41,62 +40,63 @@
     return '';
   }
 
-  function renderPlaceholder(root) {
+  function clearSlot(root) {
     root.innerHTML = '';
-    var button = el('button', {
-      type: 'button',
-      className: 'btn btn-payments',
-      disabled: true,
+    root.hidden = true;
+    root.removeAttribute('data-pay-card-ready');
+  }
+
+  function renderCardLink(root, url) {
+    root.innerHTML = '';
+    var link = el('a', {
+      className: 'btn pay-card-btn',
+      href: url,
+      'data-pay-card': '1',
       'aria-disabled': 'true',
-      text: COPY.button
+      tabindex: '-1',
+      text: 'Pay $500 by card'
     });
-    var panel = el('div', { className: 'payments-panel' }, [
-      el('div', { className: 'flourish', 'aria-hidden': 'true' }),
-      el('span', { className: 'label', text: COPY.pendingLabel }),
-      el('h2', { text: COPY.heading }),
-      el('div', { className: 'squiggle', 'aria-hidden': 'true' }),
-      el('p', { className: 'payments-note', text: COPY.note }),
-      el('div', { className: 'payments-actions' }, [button]),
-      el('span', { className: 'payments-status', text: COPY.comingSoon })
-    ]);
-    root.appendChild(panel);
+    root.appendChild(link);
+    root.hidden = false;
+    root.setAttribute('data-pay-card-ready', '1');
+  }
+
+  function mountLink(root, provider, providerConfig, options) {
+    if (!options.enabled) {
+      clearSlot(root);
+      return;
+    }
+    var url = checkoutUrlFor(provider, providerConfig);
+    if (!url) {
+      clearSlot(root);
+      return;
+    }
+    renderCardLink(root, url);
   }
 
   /**
-   * Stripe adapter (stub).
-   * Later: if enabled and paymentLinkUrl is an allowed hosted Stripe URL,
-   * the button may become a link to that Payment Link / Checkout page.
-   * Does not load Stripe.js, does not call any Stripe API, and does not
-   * collect card data on this site.
+   * Stripe adapter. When enabled with an allowlisted Payment Link,
+   * renders a top-level "Pay $500 by card" link. Does not load
+   * Stripe.js, does not call any Stripe API, and does not collect
+   * card data on this site.
    */
   var stripeAdapter = {
     id: 'stripe',
     mount: function (root, providerConfig, options) {
-      renderPlaceholder(root);
-      if (!options.enabled) return;
-      var url = checkoutUrlFor('stripe', providerConfig);
-      if (!url) return;
-      // Hook only: left inert in this staged build. A later, approved
-      // enablement can point the button at `url` without a redesign.
+      mountLink(root, 'stripe', providerConfig, options);
     }
   };
 
   /**
-   * Square adapter (stub).
-   * Later: if enabled and checkoutUrl is an allowed hosted Square URL,
-   * the button may become a link to that checkout page.
-   * Does not load the Square Web Payments SDK, does not call any Square
-   * API, and does not collect card data on this site.
+   * Square adapter. Same contract as Stripe, using an allowlisted
+   * hosted Square checkout URL. Does not load the Square Web Payments
+   * SDK, does not call any Square API, and does not collect card data
+   * on this site.
    */
   var squareAdapter = {
     id: 'square',
     mount: function (root, providerConfig, options) {
-      renderPlaceholder(root);
-      if (!options.enabled) return;
-      var url = checkoutUrlFor('square', providerConfig);
-      if (!url) return;
-      // Hook only: left inert in this staged build. A later, approved
-      // enablement can point the button at `url` without a redesign.
+      mountLink(root, 'square', providerConfig, options);
     }
   };
 

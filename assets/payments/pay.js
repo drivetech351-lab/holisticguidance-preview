@@ -3,34 +3,54 @@
  *
  * Main path (no Calendly event params): the client has just agreed on the
  * site and lands here with ?agreed=<policyVersion>&at=<UTC time>. They
- * enter their full name and preferred session date. The Venmo button and
- * desktop QR stay inert until both are filled; the note is
+ * enter their full name and preferred session date.
+ *
+ * If a real Venmo handle is set in pay-config.js, the Venmo button and
+ * desktop QR stay inert until both fields are filled; the note is
  * "One-hour session – {name} – {date}". After they tap "Pay $500 with
  * Venmo", step 3 appears: "I've sent payment — choose my time" opens the
  * Calendly booking URL (validated with HolisticAllowedUrl.calendly) with
- * the name prefilled and UTM tags recording the agreement and payment tap.
+ * the name prefilled and UTM tags recording the agreement and payment tap
+ * (utm_medium=venmo_paid).
+ *
+ * If the handle is missing or still the VENMO_HANDLE placeholder, the page
+ * does not link to Venmo, does not render a QR code, and never displays
+ * the placeholder string. The button area shows a short notice that Venmo
+ * payment details will be shared directly. After name and date are filled,
+ * "Choose my time" opens Calendly with utm_medium=venmo_pending.
  *
  * Name, date and tap state are kept in sessionStorage so a return from
  * the Venmo app does not lose them.
  *
  * Legacy path: if Calendly event params are present (invitee name and
  * event_start_time), the page still builds the Venmo note from those
- * details as it did when payment came after booking.
+ * details as it did when payment came after booking. The same handle-not-
+ * set fallback applies.
  *
  * Thank-you path: ?booked=1 shows a short "You're booked" message, which
  * is the better after-booking redirect now that payment happens first.
  *
  * Every value from the URL or the form is treated as untrusted: trimmed,
  * stripped of control characters, length-capped, and written with
- * textContent only. Links to Calendly are re-checked by HolisticAllowedUrl.
- * Nothing is sent anywhere.
+ * textContent only. Links to Calendly or Stripe are re-checked by
+ * HolisticAllowedUrl. Nothing is sent anywhere.
  */
 (function (global) {
   'use strict';
 
   var STORE_KEY = 'holisticguidance.pay.v1';
+  var HANDLE_PLACEHOLDER = 'VENMO_HANDLE';
+  var PENDING_COPY = 'Venmo payment details will be shared with you directly';
+  var CAL_COPY_PAID = "I've sent payment — choose my time";
+  var CAL_COPY_PENDING = 'Choose my time';
+
   var config = global.HOLISTIC_VENMO_PAY || {};
-  var handle = /^[A-Za-z0-9_-]{1,40}$/.test(config.handle || '') ? config.handle : 'VENMO_HANDLE';
+  var rawHandle = typeof config.handle === 'string' ? config.handle.trim() : '';
+  if (rawHandle.charAt(0) === '@') rawHandle = rawHandle.slice(1);
+  var handleReady = rawHandle !== '' &&
+    rawHandle !== HANDLE_PLACEHOLDER &&
+    /^[A-Za-z0-9_-]{1,40}$/.test(rawHandle);
+  var handle = handleReady ? rawHandle : '';
   var amount = /^\d+(\.\d{1,2})?$/.test(String(config.amount)) ? String(config.amount) : '500';
   var baseNote = typeof config.note === 'string' && config.note ? config.note : 'One-hour session';
 
@@ -141,6 +161,7 @@
   }
 
   function venmoUrl(note) {
+    if (!handleReady || !handle) return '';
     return 'https://venmo.com/u/' + encodeURIComponent(handle) +
       '?txn=pay&amount=' + encodeURIComponent(amount) +
       '&note=' + encodeURIComponent(note);
@@ -151,7 +172,7 @@
     return global.HolisticAllowedUrl.calendly(value);
   }
 
-  function calendlyUrl(name, agreement, tapAt) {
+  function calendlyUrl(name, agreement, tapAt, medium) {
     var sched = global.HOLISTIC_SCHEDULING || {};
     var base = safeCalendly(sched.bookingUrl || '');
     if (!base) return '';
@@ -159,7 +180,7 @@
       var u = new URL(base);
       if (name) u.searchParams.set('name', name);
       u.searchParams.set('utm_source', 'holisticguidance.life');
-      u.searchParams.set('utm_medium', 'venmo_paid');
+      u.searchParams.set('utm_medium', medium || (handleReady ? 'venmo_paid' : 'venmo_pending'));
       if (agreement.agreed) u.searchParams.set('utm_campaign', agreement.agreed);
       if (agreement.at) u.searchParams.set('utm_content', 'agreed_' + agreement.at);
       if (tapAt) u.searchParams.set('utm_term', tapAt);
@@ -173,7 +194,11 @@
     var fig = document.querySelector('[data-venmo-qr]');
     if (!fig) return;
     var img = fig.querySelector('img');
-    if (!show || !url || typeof global.qrcode !== 'function' || !img) { fig.hidden = true; return; }
+    if (!show || !url || !handleReady || typeof global.qrcode !== 'function' || !img) {
+      if (img) { img.removeAttribute('src'); img.removeAttribute('width'); img.removeAttribute('height'); }
+      fig.hidden = true;
+      return;
+    }
     try {
       var qr = global.qrcode(0, 'M');
       qr.addData(url);
@@ -201,10 +226,23 @@
     if (wrap) wrap.setAttribute('data-pay-mode', mode);
   }
 
+  function setPendingVisible(show) {
+    var notice = document.querySelector('[data-venmo-pending]');
+    if (!notice) return;
+    if (show) {
+      notice.textContent = PENDING_COPY;
+      notice.hidden = false;
+    } else {
+      notice.hidden = true;
+    }
+  }
+
   function setVenmo(url, enabled) {
+    var readyLink = handleReady && enabled && !!url;
     Array.prototype.forEach.call(document.querySelectorAll('[data-venmo-pay]'), function (a) {
-      a.setAttribute('aria-disabled', enabled ? 'false' : 'true');
-      if (enabled && url) {
+      a.hidden = !handleReady;
+      a.setAttribute('aria-disabled', readyLink ? 'false' : 'true');
+      if (readyLink) {
         a.setAttribute('href', url);
         a.removeAttribute('tabindex');
       } else {
@@ -212,13 +250,23 @@
         a.setAttribute('tabindex', '-1');
       }
     });
-    renderQr(url, enabled && !!url);
+    setPendingVisible(!handleReady);
+    renderQr(url, readyLink);
   }
 
-  function setCalendlyLink(url, visible) {
+  function setCardEnabled(enabled) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pay-card]'), function (a) {
+      a.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+      if (enabled) a.removeAttribute('tabindex');
+      else a.setAttribute('tabindex', '-1');
+    });
+  }
+
+  function setCalendlyLink(url, visible, label) {
     var wrap = document.querySelector('[data-pay-step3]');
     var a = document.querySelector('[data-pay-calendly]');
     if (a) {
+      if (label) a.textContent = label;
       if (url) {
         a.setAttribute('href', url);
         a.removeAttribute('aria-disabled');
@@ -230,6 +278,15 @@
     if (wrap) wrap.hidden = !visible;
   }
 
+  function hidePaymentControls() {
+    setPendingVisible(false);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-venmo-pay]'), function (a) {
+      a.hidden = true;
+    });
+    var slot = document.querySelector('[data-payments-root]');
+    if (slot) slot.hidden = true;
+  }
+
   function applyThanks(q) {
     setMode('thanks');
     setText('[data-pay-heading]', "You're booked", false);
@@ -238,14 +295,16 @@
     if (steps) steps.hidden = true;
     var fields = document.querySelector('[data-pay-fields]');
     if (fields) fields.hidden = true;
-    Array.prototype.forEach.call(document.querySelectorAll('[data-venmo-pay]'), function (a) {
-      a.hidden = true;
-    });
+    hidePaymentControls();
     var name = clientNameFromQuery(q);
     var when = sessionTime(q);
     setText('[data-pay-for]', name, true);
     setText('[data-pay-when]', when ? when.long : '', true);
     setVenmo('', false);
+    setPendingVisible(false);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-venmo-pay]'), function (a) {
+      a.hidden = true;
+    });
     setCalendlyLink('', false);
   }
 
@@ -254,7 +313,7 @@
     var name = clientNameFromQuery(q);
     var when = sessionTime(q);
     var note = buildNote(name, when);
-    var url = venmoUrl(note);
+    var url = handleReady ? venmoUrl(note) : '';
     setText('[data-pay-heading]', "You're booked", false);
     setText('[data-pay-when]', when ? when.long : '', true);
     setText('[data-pay-for]', name, true);
@@ -263,7 +322,7 @@
     if (steps) steps.hidden = true;
     var fields = document.querySelector('[data-pay-fields]');
     if (fields) fields.hidden = true;
-    setVenmo(url, true);
+    setVenmo(url, handleReady);
     setCalendlyLink('', false);
   }
 
@@ -279,6 +338,8 @@
 
     if (nameEl && !nameEl.value && store.name) nameEl.value = clean(String(store.name), 60);
     if (dateEl && !dateEl.value && store.date && formatPrefDate(store.date)) dateEl.value = store.date;
+
+    var medium = handleReady ? 'venmo_paid' : 'venmo_pending';
 
     function state() {
       var name = nameEl ? clean(nameEl.value, 60) : '';
@@ -296,22 +357,36 @@
         agreed: agreement.agreed,
         at: agreement.at,
         tapped: !!(extra && extra.tapped) || !!store.tapped,
-        tapAt: (extra && extra.tapAt) || store.tapAt || ''
+        tapAt: (extra && extra.tapAt) || store.tapAt || '',
+        medium: (extra && extra.medium) || store.medium || ''
       };
       store = next;
       saveStore(next);
       return next;
     }
 
+    function currentMedium(saved) {
+      var m = (saved && saved.medium) || medium;
+      if (m === 'venmo_paid' || m === 'venmo_pending' || m === 'stripe_paid') return m;
+      return handleReady ? 'venmo_paid' : 'venmo_pending';
+    }
+
     function refresh(opts) {
       var s = state();
       var justTapped = opts && opts.tapped;
-      var saved = persist(justTapped ? { tapped: true, tapAt: isoStamp() } : null);
-      var url = s.ready ? venmoUrl(buildNote(s.name, s.pref)) : '';
-      setVenmo(url, s.ready);
-      var showStep3 = s.name && (saved.tapped || justTapped);
-      var cal = showStep3 ? calendlyUrl(s.name, agreement, saved.tapAt) : '';
-      setCalendlyLink(cal, showStep3);
+      var extra = null;
+      if (justTapped) {
+        extra = { tapped: true, tapAt: isoStamp(), medium: (opts && opts.medium) || medium };
+      }
+      var saved = persist(extra);
+      var url = (handleReady && s.ready) ? venmoUrl(buildNote(s.name, s.pref)) : '';
+      setVenmo(url, !!(handleReady && s.ready));
+      setCardEnabled(s.ready);
+      var usedMedium = currentMedium(saved);
+      var showStep3 = s.name && ((handleReady && (saved.tapped || justTapped)) || (!handleReady && s.ready));
+      var calLabel = usedMedium === 'venmo_pending' ? CAL_COPY_PENDING : CAL_COPY_PAID;
+      var cal = showStep3 ? calendlyUrl(s.name, agreement, saved.tapAt, usedMedium) : '';
+      setCalendlyLink(cal, showStep3, calLabel);
       return url;
     }
 
@@ -334,10 +409,54 @@
       a.setAttribute('data-bound', '1');
       a.addEventListener('click', function (e) {
         var s = state();
-        if (!s.ready) { e.preventDefault(); if (nameEl && !s.name) nameEl.focus(); else if (dateEl) dateEl.focus(); return; }
-        refresh({ tapped: true });
+        if (!handleReady || !s.ready) {
+          e.preventDefault();
+          if (nameEl && !s.name) nameEl.focus();
+          else if (dateEl) dateEl.focus();
+          return;
+        }
+        refresh({ tapped: true, medium: 'venmo_paid' });
       });
     });
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pay-card]'), function (a) {
+      if (a.getAttribute('data-bound')) return;
+      a.setAttribute('data-bound', '1');
+      a.addEventListener('click', function (e) {
+        var s = state();
+        if (!s.ready) {
+          e.preventDefault();
+          if (nameEl && !s.name) nameEl.focus();
+          else if (dateEl) dateEl.focus();
+          return;
+        }
+        refresh({ tapped: true, medium: 'stripe_paid' });
+      });
+    });
+
+    // Stripe slot may mount after this first pass; bind and enable once it appears.
+    var slot = document.querySelector('[data-payments-root]');
+    if (slot && !slot.getAttribute('data-card-watch')) {
+      slot.setAttribute('data-card-watch', '1');
+      var obs = new MutationObserver(function () {
+        Array.prototype.forEach.call(document.querySelectorAll('[data-pay-card]'), function (a) {
+          if (a.getAttribute('data-bound')) return;
+          a.setAttribute('data-bound', '1');
+          a.addEventListener('click', function (e) {
+            var s = state();
+            if (!s.ready) {
+              e.preventDefault();
+              if (nameEl && !s.name) nameEl.focus();
+              else if (dateEl) dateEl.focus();
+              return;
+            }
+            refresh({ tapped: true, medium: 'stripe_paid' });
+          });
+        });
+        refresh();
+      });
+      obs.observe(slot, { childList: true, subtree: true });
+    }
   }
 
   function apply() {
@@ -354,9 +473,10 @@
   }
 
   global.HolisticVenmoPay = {
+    handleReady: handleReady,
     build: function (n, w) { return venmoUrl(buildNote(n, w)); },
-    calendly: function (n, agreed, at, tapAt) {
-      return calendlyUrl(n, { agreed: agreed || '', at: at || '' }, tapAt || '');
+    calendly: function (n, agreed, at, tapAt, medium) {
+      return calendlyUrl(n, { agreed: agreed || '', at: at || '' }, tapAt || '', medium);
     }
   };
 })(window);
